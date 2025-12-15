@@ -25,7 +25,7 @@
 
         $oReturn = new xajaxResponse();
 
-        $idempresa  = $_SESSION['U_EMPRESA'];
+        $idempresa  = isset($_SESSION['U_EMPRESA']) ? intval($_SESSION['U_EMPRESA']) : 0;
 
         // LISTA EMPRESA
         $sql = "SELECT empr_cod_empr, empr_nom_empr FROM saeempr";
@@ -128,34 +128,36 @@
         // ==========================
         // VARIABLES
         // ==========================
-        $empresa   = $aForm['empresa'];
+        $empresa   = isset($aForm['empresa']) ? intval($aForm['empresa']) : 0;
+        $proveedor = isset($aForm['proveedor_codigo']) ? intval($aForm['proveedor_codigo']) : 0;
 
-        $proveedor = $aForm['proveedor_codigo'];
+        $fechaIni  = isset($aForm['fecha_ini']) ? trim($aForm['fecha_ini']) : '';
+        $fechaFin  = isset($aForm['fecha_fin']) ? trim($aForm['fecha_fin']) : '';
 
-        $fechaIni = $aForm['fecha_ini'];
-        $fechaFin = $aForm['fecha_fin'];
+        // Validar fechas (YYYY-MM-DD)
+        $fechaIni = (preg_match('/^\d{4}-\d{2}-\d{2}$/', $fechaIni)) ? $fechaIni : '';
+        $fechaFin = (preg_match('/^\d{4}-\d{2}-\d{2}$/', $fechaFin)) ? $fechaFin : '';
 
-
-        // echo '<p>Proveedor: '.$proveedor;
-        // exit;
-        
+        if ($empresa <= 0) {
+            $oReturn->alert("Seleccione una empresa para continuar con la consulta.");
+            $oReturn->assign("divFormularioDetalle", "innerHTML", "");
+            return $oReturn;
+        }
 
         // ==========================
         // FILTROS
         // ==========================
-        $proveedor = $aForm['proveedor_codigo'];
-
         $condProveedor = "";
         $condEstado    = " AND p.clpv_est_clpv <> 'A' ";
 
-        if ($proveedor !== "" && is_numeric($proveedor)) {
+        if ($proveedor > 0) {
             $condProveedor = " AND p.clpv_cod_clpv = $proveedor ";
             $condEstado = ""; 
         }
         //filtro de fechas
         $condFecha = "";
 
-        if ($proveedor == "") {
+        if ($proveedor == 0) {
 
             // si no selecciona proveedor aplicamos fechas
             if ($fechaIni != "" && $fechaFin != "") {
@@ -211,7 +213,7 @@
             <table id="tbclientes" class="table table-bordered table-hover table-striped table-condensed" style="margin-top: 30px">
                         <thead>
                             <tr>
-                                <th colspan="30"><h6>LISTA DE PEDIDOS FINALIZADOS</h6></th>
+                                <th colspan="30"><h6>LISTA DE PROVEEDORES</h6></th>
                             </tr>
 
                     <tr>
@@ -243,18 +245,25 @@
         // ==========================
         // EJECUTAR CONSULTA
         // ==========================
-        if ($oIfx->Query($sql) && $oIfx->NumFilas() > 0) {
+        $hayDatos = false;
+        if (!$oIfx->Query($sql)) {
+            $oReturn->alert("Ocurrió un problema al consultar los proveedores. Intente nuevamente.");
+        } elseif ($oIfx->NumFilas() > 0) {
             $contador = 1;
             do {
+                $hayDatos = true;
                 // ============================================================
                 // DATOS DEL PROVEEDOR
                 // ============================================================
-                $codigo  = trim($oIfx->f('clpv_cod_clpv'));
+                $codigo  = intval($oIfx->f('clpv_cod_clpv'));
                 $ruc     = trim($oIfx->f('clpv_ruc_clpv'));
                 $nombre  = trim($oIfx->f('clpv_nom_clpv'));
 
-                $sucuCod = trim($oIfx->f('clpv_cod_sucu'));
+                $sucuCod = intval($oIfx->f('clpv_cod_sucu'));
                 $sucursal_nombre = trim($oIfx->f('sucu_nom_sucu'));
+                if ($sucursal_nombre === '') {
+                    $sucursal_nombre = 'Sucursal no registrada';
+                }
 
                 // ============================================================
                 // CONSULTAS RELACIONADAS
@@ -273,6 +282,9 @@
                 if ($oAux->Query($sql_tel) && $oAux->NumFilas() > 0) {
                     $telefono = trim($oAux->f('tlcp_tlf_tlcp'));
                 }
+                if ($telefono === '') {
+                    $telefono = 'Teléfono no registrado';
+                }
 
                 // -------- CORREO ----------
                 $correo = "";
@@ -287,6 +299,9 @@
                 if ($oAux->Query($sql_cor) && $oAux->NumFilas() > 0) {
                     $correo = trim($oAux->f('emai_ema_emai'));
                 }
+                if ($correo === '') {
+                    $correo = 'Correo no registrado';
+                }
 
                 // -------- DIRECCIÓN ----------
                 $direccion = "";
@@ -300,6 +315,9 @@
                 ";
                 if ($oAux->Query($sql_dir) && $oAux->NumFilas() > 0) {
                     $direccion = trim($oAux->f('dire_dir_dire'));
+                }
+                if ($direccion === '') {
+                    $direccion = 'Dirección no registrada';
                 }
 
                 // ============================================================
@@ -403,21 +421,21 @@
                 $html .= "
                     <tr>
                         <td>$contador</td>
-                        <td>$codigo</td>
-                        <td>$ruc</td>
-                        <td>$nombre</td>
-                        <td>$sucursal_nombre</td>
+                        <td>".htmlspecialchars($codigo)."</td>
+                        <td>".htmlspecialchars($ruc)."</td>
+                        <td>".htmlspecialchars($nombre)."</td>
+                        <td>".htmlspecialchars($sucursal_nombre)."</td>
 
-                        <td>$grupo</td>
-                        <td>$flujo</td>
-                        <td>$zona</td>
-                        <td>$tipoProv</td>
-                        <td>$formaPago</td>
-                        <td>$destino</td>
+                        <td>".htmlspecialchars($grupo)."</td>
+                        <td>".htmlspecialchars($flujo)."</td>
+                        <td>".htmlspecialchars($zona)."</td>
+                        <td>".htmlspecialchars($tipoProv)."</td>
+                        <td>".htmlspecialchars($formaPago)."</td>
+                        <td>".htmlspecialchars($destino)."</td>
 
-                        <td>$telefono</td>
-                        <td>$correo</td>
-                        <td>$direccion</td>
+                        <td>".htmlspecialchars($telefono)."</td>
+                        <td>".htmlspecialchars($correo)."</td>
+                        <td>".htmlspecialchars($direccion)."</td>
 
                         <td align='center'>
                             <input type='checkbox' name='prov_$codigo' value='$codigo'>
@@ -428,11 +446,14 @@
 
             } while ($oIfx->SiguienteRegistro());
 
-        } else {
-            $html .= '<tr><td colspan="40" style="text-align:center;">NO EXISTEN DATOS</td></tr>';
         }
 
-        $html .= "</tbody></table>";
+        if (!$hayDatos) {
+            $html .= "</tbody></table>";
+            $html .= '<div class="alert alert-info" role="alert" style="margin-top:10px;">No existen proveedores para los filtros seleccionados.</div>';
+        } else {
+            $html .= "</tbody></table>";
+        }
 
         $oReturn->assign("divFormularioDetalle", "innerHTML", $html);
         $oReturn->script("init()");
@@ -453,33 +474,81 @@
         $oIfx->Conectar();
 
         $oReturn = new xajaxResponse();
-        $empresa = $_SESSION['U_EMPRESA'];
+        $empresa = isset($_SESSION['U_EMPRESA']) ? intval($_SESSION['U_EMPRESA']) : 0;
 
-        $activados = 0;
+        if ($empresa <= 0) {
+            $oReturn->alert("No se pudo identificar la empresa. Inicie sesión nuevamente.");
+            return $oReturn;
+        }
 
+        if (!is_array($aForm) || empty($aForm)) {
+            $oReturn->alert("No se recibieron datos del formulario.");
+            return $oReturn;
+        }
+
+        $seleccionados = [];
         foreach ($aForm as $key => $value) {
-
             // SOLO CAMPOS QUE SEAN prov_123
             if (strpos($key, "prov_") === 0) {
-
                 $codigo = intval($value);
-
-                // ACTUALIZAR ESTADO A ACTIVO
-                $sql = "
-                    UPDATE saeclpv
-                    SET clpv_est_clpv = 'A'
-                    WHERE clpv_cod_empr = $empresa
-                    AND clpv_cod_clpv = $codigo
-                ";
-
-                if ($oIfx->Query($sql)) {
-                    $activados++;
+                if ($codigo > 0) {
+                    $seleccionados[] = $codigo;
                 }
             }
         }
 
+        if (count($seleccionados) === 0) {
+            $oReturn->alert("Seleccione al menos un proveedor para aprobar.");
+            return $oReturn;
+        }
+
+        $activados = 0;
+        $omitidos = 0;
+
+        foreach ($seleccionados as $codigo) {
+
+            // Verificar estado actual
+            $sqlVerifica = "
+                SELECT clpv_est_clpv
+                FROM saeclpv
+                WHERE clpv_cod_empr = $empresa
+                AND clpv_cod_clpv = $codigo
+                LIMIT 1
+            ";
+
+            $estadoActual = '';
+            if ($oIfx->Query($sqlVerifica) && $oIfx->NumFilas() > 0) {
+                $estadoActual = trim($oIfx->f('clpv_est_clpv'));
+            }
+
+            if ($estadoActual === 'A') {
+                $omitidos++;
+                continue;
+            }
+
+            // ACTUALIZAR ESTADO A ACTIVO SOLO SI NO ESTÁ ACTIVO
+            $sql = "
+                UPDATE saeclpv
+                SET clpv_est_clpv = 'A'
+                WHERE clpv_cod_empr = $empresa
+                AND clpv_cod_clpv = $codigo
+                AND clpv_est_clpv <> 'A'
+            ";
+
+            if ($oIfx->Query($sql)) {
+                $activados++;
+            } else {
+                $omitidos++;
+            }
+        }
+
         // Mensaje al usuario
-        $oReturn->alert("Proveedores activados correctamente");
+        $mensaje = "Proveedores aprobados: $activados.";
+        if ($omitidos > 0) {
+            $mensaje .= " Omitidos (ya aprobados o sin cambios): $omitidos.";
+        }
+
+        $oReturn->alert($mensaje);
 
         $oReturn->script("consultar()");
 
