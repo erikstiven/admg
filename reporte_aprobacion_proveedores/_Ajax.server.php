@@ -34,9 +34,8 @@
         $html = '
         <h3>APROBACION DE PROVEEDORES</h3>
 
-        <div class="row" style="margin-top:10px; margin-bottom:10px;">
-            <div class="col-md-12" style="display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end;">
-
+        <div class="row" style="margin-top:10px; margin-bottom:15px;">
+            <div class="col-md-12" style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
                 <div class="btn-group" style="margin-right:10px;">
                     <div class="btn btn-primary btn-sm" onclick="genera_formulario();">
                         <span class="glyphicon glyphicon-file"></span> Nuevo
@@ -45,12 +44,17 @@
                         <span class="glyphicon glyphicon-floppy-disk"></span> Guardar
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <div class="row" style="margin-bottom:10px; padding:10px 12px; background:#f7f7f7; border:1px solid #e0e0e0; border-radius:4px;">
+            <div class="col-md-12" style="display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end;">
 
                 <div class="form-group" style="min-width:220px;">
                     <label style="margin-bottom:4px;">* Empresa</label>
                     <select id="empresa" name="empresa" class="form-control input-sm">
-                        <option value="">Seleccione una opción...</option>' 
-                        . $lista_empr . 
+                        <option value="">Seleccione una opción...</option>'
+                        . $lista_empr .
                     '</select>
                 </div>
 
