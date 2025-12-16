@@ -64,7 +64,8 @@
                         <input type="hidden" id="proveedor_codigo" name="proveedor_codigo">
                         <input type="text" id="proveedor_nombre" name="proveedor_nombre"
                             class="form-control input-sm"
-                            placeholder="ESCRIBA EL PROVEEDOR Y PRESIONE ENTER O F4">
+                            placeholder="ESCRIBA EL PROVEEDOR Y PRESIONE ENTER O F4"
+                            onkeydown="proveedorKeyHandler(event)">
                         <span class="input-group-addon primary" onclick="autocompletar_proveedor_btn()">
                             <i class="fa fa-search"></i>
                         </span>

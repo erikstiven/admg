@@ -205,6 +205,22 @@
         }
 
 
+        function proveedorKeyHandler(event) {
+            var key = event.key || event.keyCode;
+
+            if (key === 'Enter' || key === 13) {
+                event.preventDefault();
+                limpiarConsulta();
+                consultar();
+                return;
+            }
+
+            if (key === 'F4' || key === 115) {
+                event.preventDefault();
+                autocompletar_proveedor_btn();
+            }
+        }
+
         function autocompletar_proveedor_btn() {
             var empresa  = document.getElementById("empresa").value;
             var nombre   = document.getElementById("proveedor_nombre").value;
