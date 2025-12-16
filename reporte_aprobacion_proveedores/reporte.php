@@ -208,14 +208,7 @@
         function proveedorKeyHandler(event) {
             var key = event.key || event.keyCode;
 
-            if (key === 'Enter' || key === 13) {
-                event.preventDefault();
-                limpiarConsulta();
-                consultar();
-                return;
-            }
-
-            if (key === 'F4' || key === 115) {
+            if (key === 'Enter' || key === 13 || key === 'F4' || key === 115) {
                 event.preventDefault();
                 autocompletar_proveedor_btn();
             }
