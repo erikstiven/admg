@@ -34,11 +34,10 @@
         $html = '
         <h3>APROBACION DE PROVEEDORES</h3>
 
-        <div class="row">
+        <div class="row" style="margin-top:10px; margin-bottom:10px;">
+            <div class="col-md-12" style="display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end;">
 
-            <div class="col-md-12">
-
-                <div class="btn-group" style="margin-top:10px; margin-bottom:15px; margin-left:25px;">
+                <div class="btn-group" style="margin-right:10px;">
                     <div class="btn btn-primary btn-sm" onclick="genera_formulario();">
                         <span class="glyphicon glyphicon-file"></span> Nuevo
                     </div>
@@ -47,55 +46,47 @@
                     </div>
                 </div>
 
-                <div class="form-row" style="margin-left:10px;">
+                <div class="form-group" style="min-width:220px;">
+                    <label style="margin-bottom:4px;">* Empresa</label>
+                    <select id="empresa" name="empresa" class="form-control input-sm">
+                        <option value="">Seleccione una opción...</option>' 
+                        . $lista_empr . 
+                    '</select>
+                </div>
 
-                    <div class="col-md-3">
-                        <label>* Empresa:</label>
-                        <select id="empresa" name="empresa" class="form-control input-sm">
-                            <option value="">Seleccione una opción...</option>' 
-                            . $lista_empr . 
-                        '</select>
+                <div class="form-group" style="flex:1 1 280px; min-width:260px;">
+                    <label style="margin-bottom:4px;">Proveedor</label>
+                    <div class="input-group">
+                        <input type="hidden" id="proveedor_codigo" name="proveedor_codigo">
+                        <input type="text" id="proveedor_nombre" name="proveedor_nombre"
+                            class="form-control input-sm"
+                            placeholder="ESCRIBA EL PROVEEDOR Y PRESIONE ENTER O F4">
+                        <span class="input-group-addon primary" onclick="autocompletar_proveedor_btn()">
+                            <i class="fa fa-search"></i>
+                        </span>
                     </div>
+                </div>
 
-                    <div class="col-md-3">
-                        <label>Fecha Inicio</label>
+                <div class="form-group" style="min-width:240px;">
+                    <label style="margin-bottom:4px;">Fecha</label>
+                    <div class="input-group">
                         <input type="date" id="fecha_ini" name="fecha_ini"
-                            value="" class="form-control input-sm">
-                    </div>
-
-                    <div class="col-md-3">
-                        <label>Fecha Fin</label>
+                            value="" class="form-control input-sm" aria-label="Fecha inicio">
+                        <span class="input-group-addon">–</span>
                         <input type="date" id="fecha_fin" name="fecha_fin"
-                            value="" class="form-control input-sm">
+                            value="" class="form-control input-sm" aria-label="Fecha fin">
                     </div>
+                </div>
 
-                    <div class="col-md-4">
-                        <label>Proveedores:</label>
-                        <div class="form-group input-group">
-                            <input type="hidden" id="proveedor_codigo" name="proveedor_codigo">
-                            <input type="text" id="proveedor_nombre" name="proveedor_nombre"
-                                class="form-control input-sm"
-                                placeholder="ESCRIBA EL PROVEEDOR Y PRESIONE ENTER O F4">
-                            <span class="input-group-addon primary" onclick="autocompletar_proveedor_btn()">
-                                <i class="fa fa-search"></i>
-                            </span>
-                        </div>
-                    </div>
-
+                <div class="form-group" style="min-width:150px; margin-left:auto;">
+                    <label style="margin-bottom:4px; visibility:hidden;">Acción</label>
+                    <button type="button" class="btn btn-primary btn-sm btn-block" style="width:100%;"
+                        onclick="limpiarConsulta(); consultar();">
+                        <span class="glyphicon glyphicon-search"></span> Consultar
+                    </button>
                 </div>
 
             </div>
-
-            <div class="col-md-12"><br></div>
-
-            <div class="col-md-4"></div>
-            <div class="col-md-4">
-                <div class="btn btn-primary btn-sm" onclick="limpiarConsulta(); consultar();" 
-                    style="width:100%; margin-top:10px;">
-                    <span class="glyphicon glyphicon-search"></span> Consultar
-                </div>
-            </div>
-
         </div>
         ';
 
