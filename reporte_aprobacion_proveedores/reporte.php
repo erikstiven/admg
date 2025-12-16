@@ -196,22 +196,30 @@
         }
 
        function consultar() {
+            var empresa = document.getElementById("empresa");
+            if (!empresa || empresa.value === "") {
+                alerts("Seleccione la empresa para realizar la búsqueda.", "error");
+                return;
+            }
             xajax_consultar(xajax.getFormValues('form1'));
         }
 
 
+        function proveedorKeyHandler(event) {
+            var key = event.key || event.keyCode;
+
+            if (key === 'Enter' || key === 13 || key === 'F4' || key === 115) {
+                event.preventDefault();
+                autocompletar_proveedor_btn();
+            }
+        }
+
         function autocompletar_proveedor_btn() {
             var empresa  = document.getElementById("empresa").value;
-            //var sucursal = document.getElementById("sucursal").value;
-            //var bodega   = document.getElementById("bodega").value;
             var nombre   = document.getElementById("proveedor_nombre").value;
 
-            // if (empresa === '' || sucursal === '' || bodega === '') {
-            //     alert("Seleccione empresa, sucursal y bodega");
-            //     return;
-            // }
             if (empresa === '') {
-                alert("Seleccione empresa, sucursal y bodega");
+                alerts("Seleccione la empresa para continuar.", "error");
                 return;
             }
 
@@ -236,16 +244,23 @@
         }
 
        function limpiarConsulta() {
-            // NO borres los filtros aquí
-            // document.getElementById("proveedor_codigo").value = "";
-            // document.getElementById("proveedor_nombre").value = "";
-
-            // solo limpiar la tabla
             try { $('#tbclientes').DataTable().clear().destroy(); } catch(e){}
             document.getElementById("divFormularioDetalle").innerHTML = "";
         }
 
         function guardar() {
+            var empresa = document.getElementById("empresa");
+            if (!empresa || empresa.value === "") {
+                alerts("Seleccione la empresa antes de aprobar proveedores.", "error");
+                return;
+            }
+
+            var seleccionados = document.querySelectorAll("#tbclientes tbody input[type='checkbox']:checked");
+            if (seleccionados.length === 0) {
+                alerts("Seleccione al menos un proveedor para aprobar.", "error");
+                return;
+            }
+
             xajax_guardar_proveedores(xajax.getFormValues("form1"));
         }
 
@@ -358,7 +373,6 @@
     </body>
     <script>
         genera_formulario();
-        consultar();
     
         //DATATABLE
         function init() {
@@ -524,15 +538,17 @@
                         },
                     ],
 
-                    processing: "<i class='fa fa-spinner fa-spin' style='font-size:24px; color: #34495e;'></i>",
+                    processing: true,
                     "language": {
+                        "processing": "<i class='fa fa-spinner fa-spin' style='font-size:24px; color: #34495e;'></i>",
                         "search": "<i class='fa fa-search'></i>",
                         "searchPlaceholder": "Buscar",
                         'paginate': {
                             'previous': 'Anterior',
                             'next': 'Siguiente'
                         },
-                        "zeroRecords": "No se encontraron datos",
+                        "zeroRecords": "No se encontraron proveedores con los filtros ingresados.",
+                        "emptyTable": "No existen proveedores para los filtros seleccionados.",
                         "info": "Mostrando _START_ a _END_ de  _TOTAL_ registros",
                         "infoEmpty": "No hay registros disponibles",
                         "infoFiltered": "(Filtrado de _MAX_ registros totales)",
@@ -540,9 +556,22 @@
                     "paging": true,
                     "ordering": true,
                     "info": true,
-                    "pageLength": 25,
+                    "pageLength": 10,
+                    "lengthMenu": [
+                        [10, 25, 50, 100],
+                        [10, 25, 50, 100]
+                    ],
                     "responsive": true,
-                    "autoWidth": false
+                    "autoWidth": false,
+                    "deferRender": true,
+                    "order": [[3, 'asc']],
+                    "columnDefs": [
+                        {
+                            "targets": -1,
+                            "orderable": false,
+                            "searchable": false
+                        }
+                    ]
                 });
                 
                 table.search().draw();
